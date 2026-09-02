@@ -1,0 +1,26 @@
+# 환경변수/시크릿
+.env
+*.env.local
+
+# Gradle / 빌드 산출물
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 로그·임시
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 프론트
+node_modules/
+dist/

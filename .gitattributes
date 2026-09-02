@@ -1,0 +1,15 @@
+# 줄바꿈을 저장소에서는 LF로 통일한다.
+# Windows(IntelliJ)와 Linux(GitHub Actions, EC2)를 오가도 diff가 지저분해지지 않게 한다.
+* text=auto eol=lf
+
+# 배치 파일은 Windows에서 실행되므로 CRLF여야 한다
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# 실행 스크립트는 컨테이너(Linux)에서 돌므로 반드시 LF
+gradlew text eol=lf
+
+# 바이너리
+*.jar  binary
+*.png  binary
+*.jpg  binary
