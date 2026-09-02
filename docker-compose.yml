@@ -1,0 +1,34 @@
+# 로컬 개발용 인프라
+# - 지금은 MySQL 하나만 띄운다. backend/frontend 서비스는 4일차(F-10)에 추가한다.
+# - 실행:   docker compose up -d
+# - 종료:   docker compose down          (데이터 유지)
+# - 초기화: docker compose down -v       (볼륨까지 삭제 = DB 완전 초기화)
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: moneylog-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpw}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-moneylog}
+      MYSQL_USER: ${MYSQL_USER:-moneylog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-moneylogpw}
+      TZ: Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      # 호스트 3307 → 컨테이너 3306.
+      # 다른 프로젝트(ProjectTeam_2 등)의 MySQL이 3306을 쓰고 있어도 충돌하지 않게 3307로 뺐다.
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  mysql-data:
