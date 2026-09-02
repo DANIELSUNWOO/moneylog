@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: moneylog
+  datasource:
+    url: jdbc:mysql://localhost:3307/moneylog?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+    username: moneylog
+    password: moneylogpw
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        # size=100000 같은 요청으로 DB를 통째로 긁어가는 것을 프레임워크 레벨에서 막는다.
+        max-page-size: 100
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  # 로컬 전용. Base64로 인코딩된 32바이트(256bit) 키다.
+  # 운영 값은 환경변수(JWT_SECRET)로 주입하며, openssl rand -base64 32 로 새로 만든다.
+  secret: ${JWT_SECRET:oePlRfk29HUZgRD69ORk1pavXwPB+pggWQvmuMLoHrE=}
+  access-token-expiration: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    com.moneylog: debug

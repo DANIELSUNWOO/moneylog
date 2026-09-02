@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:moneylog;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+jwt:
+  secret: MGxfhzbUjXZs/5Q6aws40Pem7NbSK0jvZ4nesi3pm/E=   # 테스트 전용 고정 키(Base64)
+  access-token-expiration: 3600000
