@@ -1,0 +1,20 @@
+# 로컬 개발 전용. docker compose 는 이 파일을 "자동으로" 찾아 base 에 덮어씌운다.
+# EC2에는 이 파일을 올리지 않으므로 운영에서는 무시된다.
+# → 파일은 두 개지만 내용 중복이 없고, 한쪽만 고치는 사고가 생기지 않는다.
+
+services:
+  mysql:
+    ports:
+      - "3307:3306"      # Workbench로 들여다보기 위해 로컬에서만 연다
+
+  backend:
+    build:
+      context: ./backend
+    image: moneylog-backend:local    # 로컬에서는 GHCR 대신 방금 빌드한 이미지를 쓴다
+    ports:
+      - "8080:8080"      # Swagger UI 직접 접근용 (로컬에서만)
+
+  frontend:
+    build:
+      context: ./frontend
+    image: moneylog-frontend:local
