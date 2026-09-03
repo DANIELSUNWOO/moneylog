@@ -1,26 +1,23 @@
-# 로컬 개발용 인프라
-# - 지금은 MySQL 하나만 띄운다. backend/frontend 서비스는 4일차(F-10)에 추가한다.
-# - 실행:   docker compose up -d
-# - 종료:   docker compose down          (데이터 유지)
-# - 초기화: docker compose down -v       (볼륨까지 삭제 = DB 완전 초기화)
+# 운영 기준 구성. EC2에서는 이 파일 하나만으로 뜬다.
+# 로컬에서는 docker-compose.override.yml 이 자동으로 병합되어 빌드·포트가 추가된다.
+#
+#   로컬 : docker compose up -d --build      (base + override)
+#   운영 : docker compose -f docker-compose.yml up -d   (base만)
+
 services:
   mysql:
     image: mysql:8.0
     container_name: moneylog-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpw}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-moneylog}
-      MYSQL_USER: ${MYSQL_USER:-moneylog}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-moneylogpw}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-moneylog}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: Asia/Seoul
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-    ports:
-      # 호스트 3307 → 컨테이너 3306.
-      # 다른 프로젝트(ProjectTeam_2 등)의 MySQL이 3306을 쓰고 있어도 충돌하지 않게 3307로 뺐다.
-      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -29,6 +26,48 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks: [moneylog-net]
+    # ports 없음 — DB는 도커 네트워크 안에서만 접근한다.
+    # 운영에서 3306을 호스트에 노출하는 것은 곧 인터넷 노출이다.
+
+  backend:
+    image: ghcr.io/danielsunwoo/moneylog-backend:${IMAGE_TAG:-latest}
+    container_name: moneylog-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # 호스트 이름이 localhost가 아니라 서비스 이름 'mysql' 이다.
+      # 같은 도커 네트워크 안에서는 서비스 이름이 DNS로 해석된다.
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME:-moneylog}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks: [moneylog-net]
+    # ports 없음 — 외부에서 8080에 직접 들어올 이유가 없다.
+    # 프론트의 nginx가 /api 를 이 컨테이너로 프록시한다.
+
+  frontend:
+    image: ghcr.io/danielsunwoo/moneylog-frontend:${IMAGE_TAG:-latest}
+    container_name: moneylog-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"          # 인터넷에 열리는 유일한 문
+    networks: [moneylog-net]
 
 volumes:
   mysql-data:
+
+networks:
+  moneylog-net:

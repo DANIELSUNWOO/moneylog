@@ -1,0 +1,10 @@
+# 빌드 컨텍스트에서 제외 — 도커 데몬으로 전송되지 않아 빌드가 빨라진다
+build/
+.gradle/
+bin/
+out/
+*.log
+.env
+.idea/
+*.iml
+# gradle/wrapper 는 빌드에 반드시 필요하므로 제외하지 않는다
