@@ -127,6 +127,7 @@ src/context/AuthContext  ← 로그인 상태·토큰
 | 5 | `handleValidation`이 "입력값이 올바르지 않습니다" 한 줄 | 어떤 필드가 왜 틀렸는지 `data`에 담아 반환 | F-07 요구사항이 "금액>0, 날짜 필수" 같은 구체적 검증이라 프론트가 필드별 에러를 표시해야 한다. |
 | 6 | CD가 `workflow_dispatch`(수동)만, 자동 배포는 주석 처리 | 기본은 수동 유지, 안정화 후 `workflow_run` 자동 배포 켜기 | 수동이 나쁜 건 아니지만, "CI 통과 → 자동 배포"를 한 번은 보여주는 게 DevOps 어필에 좋다. |
 | 7 | `ApiResponse`의 에러 필드명이 `errorCode` | 머니로그 SPEC은 `{success:false, code, message, data:null}` | 필드명을 SPEC에 맞출지 P2G에 맞출지 1-4(API 명세)에서 결정할 것. |
+| 8 | `cd.yml` 1개로 backend/frontend 배포를 같이 처리 | `cd-backend.yml` / `cd-frontend.yml`로 분리, 각자 `paths` 필터로 자기 쪽만 빌드·배포 | CI를 이미 두 파일로 나눴으니 CD도 같은 규칙(컴포넌트 하나당 파일 하나)으로 맞춰 일관성을 준다. 프론트만 바뀐 커밋에 백엔드 컨테이너까지 재시작시키는 낭비도 막는다. 단점은 한 커밋에 둘 다 바뀌면 두 배포가 병렬로 돌아 아주 짧게 프론트·백엔드 버전이 어긋나는 순간이 생길 수 있다는 것 — 서비스 하나짜리 규모라 감수 가능하다고 판단. |
 
 ---
 
