@@ -1,0 +1,51 @@
+name: CD - Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: GHCR 로그인
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # latest와 커밋 sha, 두 개의 태그를 동시에 붙인다.
+      # sha 태그가 있어야 나중에 "이 시점으로 되돌려라"는 롤백 대상이 생긴다.
+      - name: 빌드 + 푸시
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/danielsunwoo/moneylog-backend:latest
+            ghcr.io/danielsunwoo/moneylog-backend:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2에서 재배포
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/moneylog
+            docker compose pull backend
+            docker compose up -d backend
