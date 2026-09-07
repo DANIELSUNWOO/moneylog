@@ -66,6 +66,7 @@ services:
       - "80:80"          # 인터넷에 열리는 유일한 문
     volumes:
       - ./certbot/www:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     networks: [moneylog-net]
 
 volumes:
