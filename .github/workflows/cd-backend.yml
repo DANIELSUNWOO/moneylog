@@ -46,7 +46,7 @@ jobs:
       - name: AWS 자격 증명 설정 (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::847263217053:role/github-actions-moneylog-deploy
           aws-region: ap-northeast-2
 
       - name: EC2에서 재배포 (SSM)
