@@ -26,6 +26,12 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ap-northeast-2
+        awslogs-group: /moneylog/containers
+        awslogs-stream: mysql
     networks: [moneylog-net]
     # ports 없음 — DB는 도커 네트워크 안에서만 접근한다.
     # 운영에서 3306을 호스트에 노출하는 것은 곧 인터넷 노출이다.
@@ -53,6 +59,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ap-northeast-2
+        awslogs-group: /moneylog/containers
+        awslogs-stream: backend
     networks: [moneylog-net]
     # ports 없음 — 외부에서 8080에 직접 들어올 이유가 없다.
     # 프론트의 nginx가 /api 를 이 컨테이너로 프록시한다.
@@ -68,6 +80,12 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ap-northeast-2
+        awslogs-group: /moneylog/containers
+        awslogs-stream: frontend
     networks: [moneylog-net]
 
 volumes:
