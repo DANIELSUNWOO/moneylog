@@ -1,0 +1,14 @@
+# 빌드 컨텍스트에서 제외 — 도커 데몬으로 전송되지 않아 빌드가 빨라진다.
+#
+# node_modules 는 특히 반드시 제외해야 한다.
+# Dockerfile 은 npm ci 로 "리눅스용" 네이티브 바이너리(esbuild, rollup)를 설치한 뒤
+# COPY . . 를 하는데, 이때 개발 PC(윈도우)의 node_modules 가 그 위에 덮어씌워지면
+# 컨테이너 안에서 npm run build 가 깨진다. 용량도 71MB라 전송 시간까지 낭비된다.
+node_modules/
+dist/
+
+.env
+*.log
+.idea/
+*.iml
+.vscode/

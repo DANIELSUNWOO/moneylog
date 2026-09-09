@@ -1,11 +1,18 @@
 # 로컬 개발 전용. docker compose 는 이 파일을 "자동으로" 찾아 base 에 덮어씌운다.
 # EC2에는 이 파일을 올리지 않으므로 운영에서는 무시된다.
 # → 파일은 두 개지만 내용 중복이 없고, 한쪽만 고치는 사고가 생기지 않는다.
+#
+# logging 을 세 서비스 모두에서 덮어쓰는 이유:
+# base 는 운영 기준이라 awslogs 드라이버를 쓰는데, 이 드라이버는 AWS 자격증명을
+# 요구한다. 즉 자격증명이 없는 개발 PC에서는 컨테이너가 아예 뜨지 못한다.
+# (driver 를 다르게 지정하면 base 의 awslogs-* 옵션은 병합되지 않고 버려진다.)
 
 services:
   mysql:
     ports:
       - "3307:3306"      # Workbench로 들여다보기 위해 로컬에서만 연다
+    logging:
+      driver: json-file
 
   backend:
     build:
@@ -13,8 +20,12 @@ services:
     image: moneylog-backend:local    # 로컬에서는 GHCR 대신 방금 빌드한 이미지를 쓴다
     ports:
       - "8080:8080"      # Swagger UI 직접 접근용 (로컬에서만)
+    logging:
+      driver: json-file
 
   frontend:
     build:
       context: ./frontend
     image: moneylog-frontend:local
+    logging:
+      driver: json-file
