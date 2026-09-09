@@ -11,6 +11,16 @@
 - **API 문서(Swagger)**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
 - **요구사항/설계 문서**: [docs/requirements.md](docs/requirements.md) · [docs/erd.md](docs/erd.md) · [docs/api-spec.md](docs/api-spec.md)
 
+## 화면
+
+**거래내역** — 월·타입·카테고리로 걸러 보고, 조회한 페이지의 수입·지출 합계를 함께 보여줍니다.
+
+![거래내역 화면](docs/images/screenshot-transactions.png)
+
+**월별 통계** — 총수입·총지출·잔액과 카테고리별 지출 비중.
+
+![월별 통계 화면](docs/images/screenshot-statistics.png)
+
 ## 이 프로젝트를 만든 이유
 
 일본에서 클라우드·인프라 엔지니어로 커리어를 시작하는 걸 목표로 하고 있고, 그 과정에서 계획적인 자금 관리가 필요해서 이 프로젝트를 시작했습니다. 그래서 처음부터 "많은 사람을 위한 가계부"가 아니라 "제가 매일 실제로 쓰는 도구"를 목표로 설계했습니다.
