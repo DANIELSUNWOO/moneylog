@@ -3,6 +3,7 @@ package com.moneylog.backend.transaction.service;
 import com.moneylog.backend.category.entity.Category;
 import com.moneylog.backend.category.exception.CategoryErrorCode;
 import com.moneylog.backend.category.repository.CategoryRepository;
+import com.moneylog.backend.common.domain.MonthRange;
 import com.moneylog.backend.common.domain.TransactionType;
 import com.moneylog.backend.common.exception.BusinessException;
 import com.moneylog.backend.transaction.dto.TransactionRequest;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 @Service
 @RequiredArgsConstructor
@@ -62,15 +62,13 @@ public class TransactionService {
     @Transactional(readOnly = true)
     public Page<Transaction> findAll(Long userId, String yearMonth, TransactionType type,
                                      Long categoryId, Pageable pageable) {
-        YearMonth ym = parseYearMonth(yearMonth);
-        LocalDate start = ym.atDay(1);
-        LocalDate end = ym.atEndOfMonth();
+        MonthRange range = MonthRange.of(yearMonth);
 
         // 첫 조건이 소유자 필터다. 이게 빠지면 남의 거래가 섞인다.
         Specification<Transaction> spec =
                 (root, query, cb) -> cb.equal(root.get("user").get("id"), userId);
         spec = spec.and((root, query, cb) ->
-                cb.between(root.<LocalDate>get("transactionDate"), start, end));
+                cb.between(root.<LocalDate>get("transactionDate"), range.start(), range.end()));
         if (type != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("type"), type));
         }
@@ -123,17 +121,5 @@ public class TransactionService {
             throw new BusinessException(TransactionErrorCode.CATEGORY_TYPE_MISMATCH);
         }
         return category;
-    }
-
-    private YearMonth parseYearMonth(String yearMonth) {
-        if (yearMonth == null || yearMonth.isBlank()) {
-            return YearMonth.now();
-        }
-        try {
-            return YearMonth.parse(yearMonth);
-        } catch (Exception e) {
-            throw new BusinessException(com.moneylog.backend.common.exception.CommonErrorCode.VALIDATION_ERROR,
-                    "yearMonth 형식이 올바르지 않습니다. (예: 2026-09)");
-        }
     }
 }

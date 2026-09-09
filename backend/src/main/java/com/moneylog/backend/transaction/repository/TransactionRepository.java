@@ -5,6 +5,7 @@ import com.moneylog.backend.statistics.dto.CategorySumResponse;
 import com.moneylog.backend.transaction.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -30,7 +31,7 @@ public interface TransactionRepository
      */
     @Override
     @EntityGraph(attributePaths = {"category"})
-    Page<Transaction> findAll(org.springframework.data.jpa.domain.Specification<Transaction> spec, Pageable pageable);
+    Page<Transaction> findAll(Specification<Transaction> spec, Pageable pageable);
 
     /** F-05 총수입/총지출. 전체를 읽어와 자바에서 더하지 않고 DB에서 집계한다. */
     @Query("""
