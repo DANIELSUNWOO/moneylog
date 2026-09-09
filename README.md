@@ -2,11 +2,9 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen) ![React](https://img.shields.io/badge/React-19-61DAFB) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED) ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA) ![AWS](https://img.shields.io/badge/AWS-EC2%20%C2%B7%20S3%20%C2%B7%20CloudWatch-FF9900)
 
+**한국어** · [日本語](README.ja.md)
+
 로그인한 개인 사용자가 수입·지출을 기록하고, 카테고리별·월별 통계를 확인하는 가계부 웹서비스입니다. "내 데이터는 나만 접근한다"는 인가(Authorization) 원칙을 핵심으로 설계했습니다.
-
-> **English** — MoneyLog is a personal budget-tracking web app (Spring Boot + React), deployed on AWS EC2 with Docker, GitHub Actions and Terraform. Live: https://sunwoomoneylog.duckdns.org · Swagger: https://sunwoomoneylog.duckdns.org/swagger-ui.html · Technical write-ups live under `docs/` (Korean).
-
-> **日本語** — こんにちは。このプロジェクトは、計画的な支出管理のために開発した個人用家計簿サービスです（Spring Boot + React、AWS EC2 上で Docker/GitHub Actions/Terraform を用いて運用）。詳細な技術文書は韓国語で書かれていますが、必要であれば日本語でもご説明できます。
 
 - **배포 URL**: https://sunwoomoneylog.duckdns.org
 - **API 문서(Swagger)**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
@@ -15,8 +13,6 @@
 ## 이 프로젝트를 만든 이유
 
 일본에서 클라우드·인프라 엔지니어로 커리어를 시작하는 걸 목표로 하고 있고, 그 과정에서 계획적인 자금 관리가 필요해서 이 프로젝트를 시작했습니다. 그래서 처음부터 "많은 사람을 위한 가계부"가 아니라 "제가 매일 실제로 쓰는 도구"를 목표로 설계했습니다.
-
-> **日本語** — 日本でクラウド・インフラエンジニアとしてキャリアをスタートすることを目標にしており、その過程で計画的な資金管理が必要だったため、このプロジェクトを始めました。そのため、最初から「多くの人のための家計簿」ではなく、「私自身が毎日実際に使うツール」を目指して設計しています。
 
 ## 왜 인프라에 집중했는가
 
@@ -35,15 +31,18 @@
 | 인프라 재현성 | 콘솔로 만들었던 인프라 6개 그룹·15개 리소스를 `terraform import`로 코드화, `plan` 결과 무변경 검증 | [terraform-import.md](docs/terraform-import.md) |
 | 협업 워크플로우 | trunk-based 브랜치 전략 + PR 필수·CI 통과 필수 브랜치 보호 규칙, squash-only 병합 | [branching-strategy.md](docs/branching-strategy.md) |
 | 실전 트러블슈팅 | 배포 도메인 전환 후 발생한 CORS 오류 원인 분석·해결 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) |
+| 인가 검증 | 핵심 원칙을 문서가 아니라 테스트로 고정 — 남의 데이터 접근 시 404, 토큰 검증, 카테고리 타입 변경 차단 등 통합 테스트 17개를 PR마다 CI에서 실행 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
 | 전체 로드맵 | 위 항목들을 계획한 단계별 DevOps 학습 로드맵 | [devops-roadmap.md](docs/devops-roadmap.md) |
 
 이 중 상당수(OIDC, IaC, 관측성, 백업/복구 리허설)는 일반적인 신입 포트폴리오에서 잘 다루지 않는, 실제 운영 경험이 있어야 나오는 항목들입니다. 각 단계를 왜 교안 범위 밖까지 확장했는지, 그리고 비용·시간 안에서 어떤 트레이드오프를 선택했는지는 [devops-roadmap.md](docs/devops-roadmap.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
-**Backend**: Java 21, Spring Boot 3.x, Spring Data JPA, Spring Security + JWT, Bean Validation, springdoc-openapi(Swagger), MySQL 8
-**Frontend**: React 19, Vite, react-router-dom, axios
-**Infra / DevOps**: Docker(멀티스테이지 빌드), Docker Compose, GitHub Actions(OIDC 인증), AWS(EC2 · S3 · CloudWatch · IAM · SSM), Terraform, Let's Encrypt, DuckDNS, nginx
+| 영역 | 사용 기술 |
+|---|---|
+| Backend | Java 21, Spring Boot 3.x, Spring Data JPA, Spring Security + JWT, Bean Validation, springdoc-openapi(Swagger), MySQL 8 |
+| Frontend | React 19, Vite, react-router-dom, axios |
+| Infra / DevOps | Docker(멀티스테이지 빌드), Docker Compose, GitHub Actions(OIDC 인증), AWS(EC2 · S3 · CloudWatch · IAM · SSM), Terraform, Let's Encrypt, DuckDNS, nginx |
 
 ## 아키텍처 개요
 
@@ -96,4 +95,4 @@ docker compose up -d --build
 
 ## 다음 계획
 
-남은 기간에는 새 기능을 늘리기보다 지금 있는 것의 완성도를 올리는 데 씁니다: 인가 규칙("내 데이터는 나만 접근한다")을 검증하는 테스트 코드, Terraform state의 S3 백엔드 이전, 위에 적은 인스턴스 내부 설정의 코드화. 예산 기능·통계 시각화·CSV export 같은 기능 확장은 그 다음 순서입니다.
+남은 기간에는 새 기능을 늘리기보다 지금 있는 것의 완성도를 올리는 데 씁니다: Terraform state를 로컬에서 S3 백엔드로 옮기고, 위에 적은 인스턴스 내부 설정을 코드화하는 것입니다. 예산 기능·통계 시각화·CSV export 같은 기능 확장은 그 다음 순서입니다.
