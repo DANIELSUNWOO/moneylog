@@ -54,7 +54,7 @@ jobs:
             --instance-ids "i-0ee7f6a4eade2fdbb" \
             --document-name "AWS-RunShellScript" \
             --comment "CD - Backend deploy" \
-            --parameters '{"commands":["cd /home/ec2-user/moneylog","docker compose pull backend","docker compose up -d backend"]}' \
+            --parameters '{"commands":["cd /home/ec2-user/moneylog","docker compose -f docker-compose.yml pull backend","docker compose -f docker-compose.yml up -d backend"]}' \
             --query "Command.CommandId" --output text)
           echo "Command ID: $COMMAND_ID"
 
