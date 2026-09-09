@@ -49,8 +49,20 @@ public class CategoryService {
     public CategoryResponse update(Long userId, Long categoryId, CategoryRequest request) {
         Category category = getOwnedCategory(userId, categoryId);
 
-        boolean changed = !category.getName().equals(request.name()) || category.getType() != request.type();
-        if (changed) {
+        boolean typeChanged = category.getType() != request.type();
+        boolean nameChanged = !category.getName().equals(request.name());
+
+        // erd.md D-1에서 transactions.type을 categories.type의 복제본으로 두기로 했고,
+        // 그 대가로 "두 값은 항상 같다"는 불변식을 서비스가 직접 지키기로 했다.
+        // TransactionService는 거래 등록·수정 시점에 이 검사를 하지만, 카테고리 타입이
+        // 뒤늦게 바뀌는 경로를 막지 않으면 이미 쌓인 거래들은 옛 타입으로 남아
+        // "지출 카테고리에 매달린 수입 거래"가 조용히 생기고 통계가 어긋난다.
+        // 삭제를 막는 CATEGORY_IN_USE와 같은 이유다 — 거래를 옮긴 뒤에 바꾸게 한다.
+        if (typeChanged && transactionRepository.existsByCategoryId(category.getId())) {
+            throw new BusinessException(CategoryErrorCode.CATEGORY_TYPE_CHANGE_NOT_ALLOWED);
+        }
+
+        if (nameChanged || typeChanged) {
             validateNotDuplicated(userId, request.name(), request.type());
         }
 

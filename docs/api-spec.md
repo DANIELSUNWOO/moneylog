@@ -130,6 +130,7 @@
 
 - 같은 이름+타입 중복 → `409 DUPLICATE_CATEGORY`.
 - **거래가 달린 카테고리는 삭제 불가** → `409 CATEGORY_IN_USE`. (erd.md D-2)
+- **거래가 달린 카테고리는 타입 변경 불가** → `409 CATEGORY_TYPE_CHANGE_NOT_ALLOWED`. 이름만 바꾸는 것은 허용한다. (erd.md D-1, 아래 D-16)
 - 목록은 페이징하지 않는다. 개인 카테고리는 많아야 수십 개다.
 
 ---
@@ -239,6 +240,7 @@
 | 409 | `DUPLICATE_EMAIL` | 이미 가입된 이메일 |
 | 409 | `DUPLICATE_CATEGORY` | 같은 이름·타입 카테고리 존재 |
 | 409 | `CATEGORY_IN_USE` | 거래가 있는 카테고리 삭제 시도 |
+| 409 | `CATEGORY_TYPE_CHANGE_NOT_ALLOWED` | 거래가 있는 카테고리의 타입 변경 시도 |
 | 500 | `INTERNAL_ERROR` | 예기치 못한 오류 |
 
 명명 규칙: `DUPLICATE_*`(중복), `*_NOT_FOUND`(없음), `*_ERROR`(처리 실패). 도메인별 enum이 `ErrorCode` 인터페이스를 구현한다. (reference-p2g.md 2-4 패턴 재사용, 필드명만 `errorCode`→`code`)
@@ -362,6 +364,7 @@ F-08(프론트 화면)은 7장의 화면 흐름, F-10(배포)은 4일차 작업�
 | D-13 | `byCategory`에 `categoryId` 포함 | `categoryName`만 | 차트 조각을 클릭해 해당 카테고리로 필터링하려면 id가 필요하다. 이름은 타입이 다르면 중복될 수도 있다. |
 | D-14 | 화면 **3종** | 4종 | requirements.md D-1에서 목록·등록을 한 화면으로 통합하기로 결정. 등록은 목록 화면의 폼/모달. |
 | D-15 | `CATEGORY_IN_USE`, `CATEGORY_TYPE_MISMATCH` 코드 추가 | 표준 코드표에 없음 | 각각 erd.md D-2(삭제 차단)와 D-1(type 일치 검증) 정책을 API 레벨에서 표현하려면 전용 코드가 필요하다. |
+| D-16 | 거래가 달린 카테고리의 **타입 변경 차단** (`CATEGORY_TYPE_CHANGE_NOT_ALLOWED`) | 자유롭게 변경 가능 | 코드 리뷰 중 발견한 결함을 반영한 결정. erd.md D-1은 `transactions.type`을 `categories.type`의 복제본으로 두고 "두 값은 항상 같다"를 서비스가 지키기로 했는데, 검증이 거래 등록·수정 경로에만 있고 카테고리 수정 경로에는 없었다. 그래서 거래가 쌓인 뒤 카테고리 타입을 바꾸면 기존 거래는 옛 타입으로 남아 통계가 조용히 어긋났다. 비정규화를 선택하면 불변식을 지켜야 하는 지점이 **한 곳이 아니라 여러 곳**이라는 것을 놓친 사례다. |
 
 ---
 
