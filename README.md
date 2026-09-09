@@ -4,7 +4,7 @@
 
 로그인한 개인 사용자가 수입·지출을 기록하고, 카테고리별·월별 통계를 확인하는 가계부 웹서비스입니다. "내 데이터는 나만 접근한다"는 인가(Authorization) 원칙을 핵심으로 설계했습니다.
 
-> **English** — MoneyLog is a personal budget-tracking web app (Spring Boot + React, deployed on AWS EC2 via Docker/GitHub Actions/Terraform). Live: https://sunwoomoneylog.duckdns.org · Swagger: https://sunwoomoneylog.duckdns.org/swagger-ui.html. The detailed write-ups under `docs/` are in Korean, but I'm happy to walk through any part of this project in English as well.
+> **English** — MoneyLog is a personal budget-tracking web app (Spring Boot + React), deployed on AWS EC2 with Docker, GitHub Actions and Terraform. Live: https://sunwoomoneylog.duckdns.org · Swagger: https://sunwoomoneylog.duckdns.org/swagger-ui.html · Technical write-ups live under `docs/` (Korean).
 
 > **日本語** — こんにちは。このプロジェクトは、計画的な支出管理のために開発した個人用家計簿サービスです（Spring Boot + React、AWS EC2 上で Docker/GitHub Actions/Terraform を用いて運用）。詳細な技術文書は韓国語で書かれていますが、必要であれば日本語でもご説明できます。
 
@@ -14,9 +14,9 @@
 
 ## 이 프로젝트를 만든 이유
 
-일본에서 클라우드·인프라 엔지니어로 커리어를 시작하는 걸 목표로 하고 있고, 그 과정에서 계획적인 자금 관리가 필요해서 이 프로젝트를 시작했습니다. 동시에 배운 기술을 복습할 좋은 핑계이기도 했고요. 그래서 이 프로젝트는 처음부터 "많은 사람을 위한 가계부"가 아니라 "제가 매일 실제로 쓰는 도구"를 목표로 설계했습니다.
+일본에서 클라우드·인프라 엔지니어로 커리어를 시작하는 걸 목표로 하고 있고, 그 과정에서 계획적인 자금 관리가 필요해서 이 프로젝트를 시작했습니다. 그래서 처음부터 "많은 사람을 위한 가계부"가 아니라 "제가 매일 실제로 쓰는 도구"를 목표로 설계했습니다.
 
-> **日本語** — 日本でクラウド・インフラエンジニアとしてキャリアをスタートすることを目標にしており、その過程で計画的な資金管理が必要だったため、このプロジェクトを始めました。同時に、これまで学んだ技術を復習する良い口実でもありました。そのため、このプロジェクトは最初から「多くの人のための家計簿」ではなく、「私自身が毎日実際に使うツール」を目指して設計しています。
+> **日本語** — 日本でクラウド・インフラエンジニアとしてキャリアをスタートすることを目標にしており、その過程で計画的な資金管理が必要だったため、このプロジェクトを始めました。そのため、最初から「多くの人のための家計簿」ではなく、「私自身が毎日実際に使うツール」を目指して設計しています。
 
 ## 왜 인프라에 집중했는가
 
@@ -48,28 +48,32 @@
 ## 아키텍처 개요
 
 ```mermaid
-flowchart LR
+flowchart TB
+    U((사용자))
+
     subgraph GH["GitHub"]
-        A[Push to main] --> B[GitHub Actions CI]
-        B -->|OIDC, 정적 키 없음| C[AWS IAM Role]
+        A[Push to main] --> B[Actions: 빌드 · GHCR 푸시]
+        B -->|OIDC 인증, 정적 키 없음| C[AWS IAM Role]
     end
+
     C --> D[SSM SendCommand]
+
     subgraph EC2["EC2 (moneylog-server)"]
-        D --> E[docker compose up]
-        E --> F[frontend nginx]
-        E --> G[backend Spring Boot]
-        E --> H[(MySQL)]
-        F -->|HTTPS, Let's Encrypt| I((사용자))
+        D -->|docker compose up| F[nginx + React 빌드산출물]
+        F -->|/api 프록시| G[Spring Boot]
+        G --> H[(MySQL)]
     end
+
+    U -->|HTTPS · Let's Encrypt| F
     G -->|awslogs| J[CloudWatch Logs]
-    E -->|CloudWatch Agent| K[CloudWatch Metrics + Alarm]
-    H -->|매일 새벽 4시 백업| L[(S3 백업 버킷)]
+    EC2 -->|CloudWatch Agent| K[CloudWatch 지표 + 알람]
+    H -->|매일 04시 백업| L[(S3 백업 버킷)]
     M[Terraform] -.코드로 관리.-> C
     M -.-> EC2
     M -.-> J
 ```
 
-모든 화살표는 콘솔 클릭이 아니라 코드(워크플로우 파일, Terraform)로 정의되어 있습니다.
+AWS 리소스(EC2·보안그룹·IAM·S3·CloudWatch)는 Terraform 코드로, 배포 경로는 워크플로우 파일로 정의되어 있습니다. 다만 **인스턴스 내부 설정 — 인증서 자동 갱신 cron, DuckDNS IP 갱신, DB 백업 스크립트, `.env` — 은 아직 수동으로 잡혀 있습니다.** 지금 인스턴스가 사라지면 `terraform apply`로 인프라는 되살아나지만 이 설정들은 다시 손으로 넣어야 합니다. 이 부분을 user_data 또는 Ansible로 옮기는 것이 다음 단계입니다.
 
 ## 기본 기능
 
@@ -92,4 +96,4 @@ docker compose up -d --build
 
 ## 다음 계획
 
-예산 기능, 통계 시각화, 검색/CSV export, 테스트 코드 등 도전 과제 항목은 로드맵상 인프라 작업 이후 순서로, 남은 기간에 여유가 되는 만큼 진행할 예정입니다.
+남은 기간에는 새 기능을 늘리기보다 지금 있는 것의 완성도를 올리는 데 씁니다: 인가 규칙("내 데이터는 나만 접근한다")을 검증하는 테스트 코드, Terraform state의 S3 백엔드 이전, 위에 적은 인스턴스 내부 설정의 코드화. 예산 기능·통계 시각화·CSV export 같은 기능 확장은 그 다음 순서입니다.

@@ -3,8 +3,9 @@
 - **작성자**: 정선우 (Jeong Sunwoo)
 - **작성일**: 2026-09-01
 - **프로젝트 기간**: 2026-09-01 ~ 2026-09-22 (기본 과제 완주) / 도전 과제는 이후 계속
-- **저장소**: (1-4 Git 셋업 후 기입)
-- **배포 URL**: (4일차 배포 후 기입)
+- **저장소**: https://github.com/DANIELSUNWOO/moneylog
+- **배포 URL**: https://sunwoomoneylog.duckdns.org
+- **API 문서(Swagger)**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
 - **관련 문서**: [도메인 모델·ERD](./erd.md), [테이블 DDL](./schema.sql), [API 명세](./api-spec.md), [1차 프로젝트 참고 노트](./reference-p2g.md)
 
 ---
