@@ -45,7 +45,7 @@
 | 인가 검증 | 핵심 원칙을 문서가 아니라 테스트로 고정 — 남의 데이터 접근 시 404, 토큰 검증, 카테고리 타입 변경 차단 등 통합 테스트 17개를 PR마다 CI에서 실행 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
 | 전체 로드맵 | 위 항목들을 계획한 단계별 DevOps 학습 로드맵 | [devops-roadmap.md](docs/devops-roadmap.md) |
 
-이 중 상당수(OIDC, IaC, 관측성, 백업/복구 리허설)는 일반적인 신입 포트폴리오에서 잘 다루지 않는, 실제 운영 경험이 있어야 나오는 항목들입니다. 각 단계를 왜 교안 범위 밖까지 확장했는지, 그리고 비용·시간 안에서 어떤 트레이드오프를 선택했는지는 [devops-roadmap.md](docs/devops-roadmap.md)에 정리되어 있습니다.
+이 중 상당수(OIDC, IaC, 관측성, 백업/복구 리허설)는 일반적인 신입 포트폴리오에서 잘 다루지 않는, 실제 운영 경험이 있어야 나오는 항목들입니다. 각 단계를 왜 여기까지 확장했는지, 그리고 비용·시간 안에서 어떤 트레이드오프를 선택했는지는 [devops-roadmap.md](docs/devops-roadmap.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
