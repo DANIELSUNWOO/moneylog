@@ -7,6 +7,7 @@
 ログインした個人ユーザーが収入・支出を記録し、カテゴリ別・月別の統計を確認する家計簿ウェブサービスです。「自分のデータには自分だけがアクセスできる」という認可（Authorization）の原則を設計の中心に据えています。
 
 - **デプロイ URL**: https://sunwoomoneylog.duckdns.org
+- **デモアカウント**: `demo@example.com` / `demo1234` — 登録なしでそのままご覧いただけます
 - **API ドキュメント（Swagger）**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
 - **要件・設計ドキュメント**: [docs/requirements.md](docs/requirements.md) · [docs/erd.md](docs/erd.md) · [docs/api-spec.md](docs/api-spec.md) — `docs/` 配下の詳細な技術文書は韓国語で書かれています
 
