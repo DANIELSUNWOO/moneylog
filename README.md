@@ -7,6 +7,7 @@
 로그인한 개인 사용자가 수입·지출을 기록하고, 카테고리별·월별 통계를 확인하는 가계부 웹서비스입니다. "내 데이터는 나만 접근한다"는 인가(Authorization) 원칙을 핵심으로 설계했습니다.
 
 - **배포 URL**: https://sunwoomoneylog.duckdns.org
+- **데모 계정**: `demo@example.com` / `demo1234` — 가입 없이 바로 둘러보실 수 있습니다
 - **API 문서(Swagger)**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
 - **요구사항/설계 문서**: [docs/requirements.md](docs/requirements.md) · [docs/erd.md](docs/erd.md) · [docs/api-spec.md](docs/api-spec.md)
 
