@@ -1,6 +1,6 @@
 # 머니로그 (MoneyLog)
 
-![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen) ![React](https://img.shields.io/badge/React-19-61DAFB) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED) ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA) ![AWS](https://img.shields.io/badge/AWS-EC2%20%C2%B7%20S3%20%C2%B7%20CloudWatch-FF9900)
+[![CI](https://github.com/DANIELSUNWOO/moneylog/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/DANIELSUNWOO/moneylog/actions/workflows/ci-backend.yml) ![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen) ![React](https://img.shields.io/badge/React-19-61DAFB) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED) ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA) ![AWS](https://img.shields.io/badge/AWS-EC2%20%C2%B7%20S3%20%C2%B7%20CloudWatch-FF9900)
 
 **한국어** · [日本語](README.ja.md)
 
@@ -43,7 +43,6 @@
 | 협업 워크플로우 | trunk-based 브랜치 전략 + PR 필수·CI 통과 필수 브랜치 보호 규칙, squash-only 병합 | [branching-strategy.md](docs/branching-strategy.md) |
 | 실전 트러블슈팅 | 배포 도메인 전환 후 발생한 CORS 오류, 그리고 README대로 로컬 실행이 되는지 실제로 확인하다 드러난 세 가지 원인(프록시·인증서·포트 충돌) | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
 | 인가 검증 | 핵심 원칙을 문서가 아니라 테스트로 고정 — 남의 데이터 접근 시 404, 토큰 검증, 카테고리 타입 변경 차단 등 통합 테스트 17개를 PR마다 CI에서 실행 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
-| 전체 로드맵 | 위 항목들을 계획한 단계별 DevOps 학습 로드맵 | [devops-roadmap.md](docs/devops-roadmap.md) |
 
 이 중 상당수(OIDC, IaC, 관측성, 백업/복구 리허설)는 일반적인 신입 포트폴리오에서 잘 다루지 않는, 실제 운영 경험이 있어야 나오는 항목들입니다. 각 단계를 왜 여기까지 확장했는지, 그리고 비용·시간 안에서 어떤 트레이드오프를 선택했는지는 [devops-roadmap.md](docs/devops-roadmap.md)에 정리되어 있습니다.
 
@@ -103,6 +102,20 @@ docker compose up -d --build
 - MySQL(Workbench 등 GUI 클라이언트 연결용): localhost:3307
 
 `docker-compose.yml`(운영 기준)에 `docker-compose.override.yml`(로컬 전용 빌드·포트 설정)이 자동으로 병합됩니다. override 파일은 EC2에 올라가지 않으므로, 로컬에서만 필요한 설정(이미지 빌드, 8080/3307 포트 노출)이 운영 배포에는 섞이지 않습니다.
+
+### 코드를 고치며 개발할 때
+
+위 방식은 배포된 모습을 그대로 재현하는 대신, 코드를 한 줄 고칠 때마다 이미지를 다시 빌드해야 합니다. 개발 중에는 **DB만 컨테이너로 띄우고 나머지는 개발 서버로** 돌리는 편이 빠릅니다.
+
+```bash
+docker compose up -d mysql          # DB만
+cd backend && ./gradlew bootRun     # 백엔드 (localhost:8080)
+cd frontend && npm run dev          # 프론트 (localhost:5173)
+```
+
+Vite 개발 서버가 `/api`를 `localhost:8080`으로 프록시하므로 이때도 CORS가 발생하지 않습니다. 백엔드는 기본 프로필에서 `localhost:3307`의 MySQL을 보는데, 이는 위 컨테이너가 여는 포트입니다.
+
+두 방식은 **8080 포트를 공유하므로 동시에 띄울 수 없습니다.**
 
 ## 다음 계획
 

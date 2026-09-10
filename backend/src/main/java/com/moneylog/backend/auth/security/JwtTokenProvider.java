@@ -53,8 +53,4 @@ public class JwtTokenProvider {
             return false;
         }
     }
-
-    public long getAccessTokenExpiration() {
-        return accessTokenExpiration;
-    }
 }

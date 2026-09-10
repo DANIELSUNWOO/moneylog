@@ -23,9 +23,9 @@ resource "aws_instance" "moneylog_server" {
   }
 
   metadata_options {
-    http_tokens                  = "required"
-    http_put_response_hop_limit  = 2
-    http_endpoint                = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    http_endpoint               = "enabled"
   }
 
   tags = {

@@ -1,6 +1,6 @@
 # マネーログ (MoneyLog)
 
-![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen) ![React](https://img.shields.io/badge/React-19-61DAFB) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED) ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA) ![AWS](https://img.shields.io/badge/AWS-EC2%20%C2%B7%20S3%20%C2%B7%20CloudWatch-FF9900)
+[![CI](https://github.com/DANIELSUNWOO/moneylog/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/DANIELSUNWOO/moneylog/actions/workflows/ci-backend.yml) ![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen) ![React](https://img.shields.io/badge/React-19-61DAFB) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED) ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA) ![AWS](https://img.shields.io/badge/AWS-EC2%20%C2%B7%20S3%20%C2%B7%20CloudWatch-FF9900)
 
 [한국어](README.md) · **日本語**
 
@@ -43,7 +43,6 @@
 | 協業ワークフロー | trunk-based のブランチ戦略、PR 必須・CI 通過必須のブランチ保護ルール、squash マージのみ許可 | [branching-strategy.md](docs/branching-strategy.md) |
 | 実践的なトラブルシューティング | デプロイ用ドメイン変更後の CORS エラー、そして README のとおりにローカルで動くかを実際に検証して判明した三つの原因（プロキシ・証明書・ポート衝突） | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
 | 認可の検証 | 中心となる原則をドキュメントではなくテストで固定 — 他人のデータへのアクセスは 404、トークン検証、カテゴリのタイプ変更の禁止など統合テスト 17 件を PR ごとに CI で実行 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
-| 全体ロードマップ | 上記の項目を計画した段階別の DevOps 学習ロードマップ | [devops-roadmap.md](docs/devops-roadmap.md) |
 
 このうち多く（OIDC、IaC、可観測性、バックアップ／復旧リハーサル）は、一般的な新卒のポートフォリオではあまり扱われない、実際の運用経験がなければ出てこない項目です。各ステップをなぜここまで広げたのか、そして費用と時間の制約の中でどのトレードオフを選んだのかは [devops-roadmap.md](docs/devops-roadmap.md) にまとめています。
 
@@ -103,6 +102,20 @@ docker compose up -d --build
 - MySQL（Workbench などの GUI クライアント接続用）: localhost:3307
 
 `docker-compose.yml`（本番基準）に `docker-compose.override.yml`（ローカル専用のビルド・ポート設定）が自動的にマージされます。override ファイルは EC2 には配置しないため、ローカルでのみ必要な設定（イメージのビルド、8080/3307 ポートの公開）が本番のデプロイに混ざることはありません。
+
+### コードを書きながら開発する場合
+
+上の方法は本番の姿をそのまま再現できる代わりに、コードを一行直すたびにイメージを再ビルドする必要があります。開発中は **DB だけをコンテナで動かし、残りは開発サーバーで** 起動するほうが速いです。
+
+```bash
+docker compose up -d mysql          # DB のみ
+cd backend && ./gradlew bootRun     # バックエンド (localhost:8080)
+cd frontend && npm run dev          # フロントエンド (localhost:5173)
+```
+
+Vite の開発サーバーが `/api` を `localhost:8080` にプロキシするため、この場合も CORS は発生しません。バックエンドはデフォルトプロファイルで `localhost:3307` の MySQL を参照しますが、これは上のコンテナが公開するポートです。
+
+なお、二つの方法は **8080 番ポートを共有するため同時には起動できません。**
 
 ## 今後の予定
 
