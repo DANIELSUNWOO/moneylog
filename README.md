@@ -41,7 +41,7 @@
 | 장애 복구 | DB 자동 백업(S3) + 실제 테이블을 지우고 복구까지 검증한 리허설 | [backup-restore-drill.md](docs/backup-restore-drill.md) |
 | 인프라 재현성 | 콘솔로 만들었던 인프라 6개 그룹·15개 리소스를 `terraform import`로 코드화, `plan` 결과 무변경 검증. state는 로컬이 아니라 버전 관리를 켠 S3 백엔드에 두어 PC가 사라져도 인프라 관리 권한을 잃지 않게 함 | [terraform-import.md](docs/terraform-import.md) |
 | 협업 워크플로우 | trunk-based 브랜치 전략 + PR 필수·CI 통과 필수 브랜치 보호 규칙, squash-only 병합 | [branching-strategy.md](docs/branching-strategy.md) |
-| 실전 트러블슈팅 | 배포 도메인 전환 후 발생한 CORS 오류 원인 분석·해결 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) |
+| 실전 트러블슈팅 | 배포 도메인 전환 후 발생한 CORS 오류, 그리고 README대로 로컬 실행이 되는지 실제로 확인하다 드러난 세 가지 원인(프록시·인증서·포트 충돌) | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
 | 인가 검증 | 핵심 원칙을 문서가 아니라 테스트로 고정 — 남의 데이터 접근 시 404, 토큰 검증, 카테고리 타입 변경 차단 등 통합 테스트 17개를 PR마다 CI에서 실행 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
 | 전체 로드맵 | 위 항목들을 계획한 단계별 DevOps 학습 로드맵 | [devops-roadmap.md](docs/devops-roadmap.md) |
 
