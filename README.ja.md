@@ -41,7 +41,7 @@
 | 障害復旧 | DB の自動バックアップ（S3）と、実際にテーブルを削除して復旧まで検証したリハーサル | [backup-restore-drill.md](docs/backup-restore-drill.md) |
 | インフラの再現性 | コンソールで作成したインフラ 6 グループ・15 リソースを `terraform import` でコード化し、`plan` が差分なしになるまで検証。state はローカルではなくバージョニングを有効にした S3 バックエンドに置き、PC が失われてもインフラの管理権を失わないようにした | [terraform-import.md](docs/terraform-import.md) |
 | 協業ワークフロー | trunk-based のブランチ戦略、PR 必須・CI 通過必須のブランチ保護ルール、squash マージのみ許可 | [branching-strategy.md](docs/branching-strategy.md) |
-| 実践的なトラブルシューティング | デプロイ用ドメインの変更後に発生した CORS エラーの原因分析と解決 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) |
+| 実践的なトラブルシューティング | デプロイ用ドメイン変更後の CORS エラー、そして README のとおりにローカルで動くかを実際に検証して判明した三つの原因（プロキシ・証明書・ポート衝突） | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
 | 認可の検証 | 中心となる原則をドキュメントではなくテストで固定 — 他人のデータへのアクセスは 404、トークン検証、カテゴリのタイプ変更の禁止など統合テスト 17 件を PR ごとに CI で実行 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
 | 全体ロードマップ | 上記の項目を計画した段階別の DevOps 学習ロードマップ | [devops-roadmap.md](docs/devops-roadmap.md) |
 
