@@ -39,7 +39,7 @@
 | デプロイの安定性 | イメージの sha タグを用いたロールバックのリハーサル（実際に前のバージョンへ戻して復旧まで確認） | [rollback-drill.md](docs/rollback-drill.md) |
 | 可観測性 | Docker の awslogs によるコンテナログ収集、CloudWatch Agent によるメモリ・ディスクのメトリクス収集、しきい値アラーム（SNS） | [cloudwatch-setup.md](docs/cloudwatch-setup.md) |
 | 障害復旧 | DB の自動バックアップ（S3）と、実際にテーブルを削除して復旧まで検証したリハーサル | [backup-restore-drill.md](docs/backup-restore-drill.md) |
-| インフラの再現性 | コンソールで作成したインフラ 6 グループ・15 リソースを `terraform import` でコード化し、`plan` が差分なしになるまで検証 | [terraform-import.md](docs/terraform-import.md) |
+| インフラの再現性 | コンソールで作成したインフラ 6 グループ・15 リソースを `terraform import` でコード化し、`plan` が差分なしになるまで検証。state はローカルではなくバージョニングを有効にした S3 バックエンドに置き、PC が失われてもインフラの管理権を失わないようにした | [terraform-import.md](docs/terraform-import.md) |
 | 協業ワークフロー | trunk-based のブランチ戦略、PR 必須・CI 通過必須のブランチ保護ルール、squash マージのみ許可 | [branching-strategy.md](docs/branching-strategy.md) |
 | 実践的なトラブルシューティング | デプロイ用ドメインの変更後に発生した CORS エラーの原因分析と解決 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) |
 | 認可の検証 | 中心となる原則をドキュメントではなくテストで固定 — 他人のデータへのアクセスは 404、トークン検証、カテゴリのタイプ変更の禁止など統合テスト 17 件を PR ごとに CI で実行 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
@@ -106,4 +106,4 @@ docker compose up -d --build
 
 ## 今後の予定
 
-残りの期間は新しい機能を増やすよりも、今あるものの完成度を上げることに使います。具体的には、Terraform の state をローカルから S3 バックエンドへ移すこと、そして上に挙げたインスタンス内部の設定をコード化することです。予算機能・統計の可視化・CSV エクスポートといった機能拡張はその次の順番になります。
+残りの期間は新しい機能を増やすよりも、今あるものの完成度を上げることに使います。次の目標は、上に挙げたインスタンス内部の設定（証明書更新の cron、DuckDNS の IP 更新、DB バックアップスクリプト）をコードに移し、インスタンスが失われても手で入れ直すものが残らない状態にすることです。予算機能・統計の可視化・CSV エクスポートといった機能拡張はその次の順番になります。

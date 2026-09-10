@@ -39,7 +39,7 @@
 | 배포 안정성 | 이미지 sha 태깅 기반 롤백 리허설(실제로 이전 버전으로 되돌렸다가 복구) | [rollback-drill.md](docs/rollback-drill.md) |
 | 관측성 | Docker awslogs로 컨테이너 로그 수집, CloudWatch Agent로 메모리·디스크 지표 수집, 임계치 알람(SNS) | [cloudwatch-setup.md](docs/cloudwatch-setup.md) |
 | 장애 복구 | DB 자동 백업(S3) + 실제 테이블을 지우고 복구까지 검증한 리허설 | [backup-restore-drill.md](docs/backup-restore-drill.md) |
-| 인프라 재현성 | 콘솔로 만들었던 인프라 6개 그룹·15개 리소스를 `terraform import`로 코드화, `plan` 결과 무변경 검증 | [terraform-import.md](docs/terraform-import.md) |
+| 인프라 재현성 | 콘솔로 만들었던 인프라 6개 그룹·15개 리소스를 `terraform import`로 코드화, `plan` 결과 무변경 검증. state는 로컬이 아니라 버전 관리를 켠 S3 백엔드에 두어 PC가 사라져도 인프라 관리 권한을 잃지 않게 함 | [terraform-import.md](docs/terraform-import.md) |
 | 협업 워크플로우 | trunk-based 브랜치 전략 + PR 필수·CI 통과 필수 브랜치 보호 규칙, squash-only 병합 | [branching-strategy.md](docs/branching-strategy.md) |
 | 실전 트러블슈팅 | 배포 도메인 전환 후 발생한 CORS 오류 원인 분석·해결 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) |
 | 인가 검증 | 핵심 원칙을 문서가 아니라 테스트로 고정 — 남의 데이터 접근 시 404, 토큰 검증, 카테고리 타입 변경 차단 등 통합 테스트 17개를 PR마다 CI에서 실행 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
@@ -106,4 +106,4 @@ docker compose up -d --build
 
 ## 다음 계획
 
-남은 기간에는 새 기능을 늘리기보다 지금 있는 것의 완성도를 올리는 데 씁니다: Terraform state를 로컬에서 S3 백엔드로 옮기고, 위에 적은 인스턴스 내부 설정을 코드화하는 것입니다. 예산 기능·통계 시각화·CSV export 같은 기능 확장은 그 다음 순서입니다.
+남은 기간에는 새 기능을 늘리기보다 지금 있는 것의 완성도를 올리는 데 씁니다. 다음 목표는 위에 적은 인스턴스 내부 설정(인증서 갱신 cron, DuckDNS IP 갱신, DB 백업 스크립트)을 코드로 옮겨, 인스턴스가 사라져도 손으로 다시 넣을 것이 남지 않게 하는 것입니다. 예산 기능·통계 시각화·CSV export 같은 기능 확장은 그 다음 순서입니다.
