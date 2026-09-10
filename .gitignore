@@ -24,3 +24,7 @@ Thumbs.db
 # 프론트
 node_modules/
 dist/
+
+# 로컬에서 docker compose 가 만드는 빈 인증서 웹루트
+# (운영용 볼륨 정의를 그대로 물려받아 생기며, 로컬에서는 쓰이지 않는다)
+certbot/

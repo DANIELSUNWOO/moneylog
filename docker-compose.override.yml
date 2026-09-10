@@ -27,5 +27,9 @@ services:
     build:
       context: ./frontend
     image: moneylog-frontend:local
+    # 운영용 nginx 설정 위에 로컬 전용 설정을 덮어쓴다.
+    # 이미지를 다시 빌드하지 않아도 되고, 운영 설정 파일은 그대로 둔 채 로컬만 바꾼다.
+    volumes:
+      - ./frontend/nginx.local.conf:/etc/nginx/conf.d/default.conf:ro
     logging:
       driver: json-file
