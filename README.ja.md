@@ -4,45 +4,53 @@
 
 [한국어](README.md) · **日本語**
 
-ログインした個人ユーザーが収入・支出を記録し、カテゴリ別・月別の統計を確認する家計簿ウェブサービスです。「自分のデータには自分だけがアクセスできる」という認可（Authorization）の原則を設計の中心に据えています。
+ログインしたユーザーが収入・支出を記録し、カテゴリ別・月別の統計を確認する家計簿ウェブサービスです。アカウントごとに家計簿が分かれており、他の人の取引履歴は見られないようにしています。
 
 - **デプロイ URL**: https://sunwoomoneylog.duckdns.org
-- **デモアカウント**: `demo@example.com` / `demo1234` — 登録なしでそのままご覧いただけます
+- **デモアカウント**: `demo@example.com` / `demo1234`（登録なしでご覧いただけます）
 - **API ドキュメント（Swagger）**: https://sunwoomoneylog.duckdns.org/swagger-ui.html
-- **要件・設計ドキュメント**: [docs/requirements.md](docs/requirements.md) · [docs/erd.md](docs/erd.md) · [docs/api-spec.md](docs/api-spec.md) — `docs/` 配下の詳細な技術文書は韓国語で書かれています
+- **要件・設計ドキュメント**: [docs/requirements.md](docs/requirements.md) · [docs/erd.md](docs/erd.md) · [docs/api-spec.md](docs/api-spec.md)（`docs/` 配下の文書は韓国語です）
 
 ## 画面
 
-**取引履歴** — 月・種別・カテゴリで絞り込み、表示中のページの収入・支出の合計も併せて表示します。
+**取引履歴**: 月・収入／支出・カテゴリで絞り込み、表示中の収入・支出の合計も表示します。
 
 ![取引履歴の画面](docs/images/screenshot-transactions.png)
 
-**月別統計** — 総収入・総支出・残高と、カテゴリ別の支出の割合。
+**月別統計**: その月の総収入・総支出・残高と、カテゴリ別の支出の割合を表示します。
 
 ![月別統計の画面](docs/images/screenshot-statistics.png)
 
 ## このプロジェクトを作った理由
 
-支出がどこに消えているのか把握できずにいたのが始まりでした。そのため最初から「多くの人のための家計簿」ではなく、「自分が毎日実際に使うツール」を目指して設計しています。
+日本でキャリアを始める前に資金を準備しておきたいと考え、お金を計画的に使うには、まず何にいくら使っているかを正確に把握する必要がありました。そこで、カテゴリ別の支出、月別の統計、その月の残高を一つの画面で確認できる家計簿を自分で作りました。
+
+最初は自分だけで使うつもりでしたが、私のように留学や海外就職を準備している人にも役立つと思い、会員登録とログインを追加しました。アカウントごとに家計簿が分かれる構造になったため、他の人の取引履歴はどの経路からも見られないことを、最初に守るべきルールとして決めました。
+
+開発は Claude と一緒に進めました。ブートキャンプで学んだ内容を、AI との対話でどこまで実装できるか確かめてみたかったからです。機能の構成や画面の配置は私が決め、実装やテスト用のダミーデータ作成のような繰り返しの作業は Claude に任せました。画面は飾るよりも記録に集中できるようシンプルにする方向で依頼し、完成した機能は自分で実際に動かして一つずつ確認しました。
 
 ## インフラで取り組んだこと
 
-このリポジトリには、「デプロイできた」で終わらず、実運用中のサービスが直面する課題 — 認証の仕組み、安全なデプロイ、可観測性、障害復旧、インフラの再現性 — を一つずつ実践し記録した過程が残っています。
+ブートキャンプで AWS、Docker、CI/CD まで学んだので、個人プロジェクトではデプロイまで最初から最後まで自分でやってみたいと考えました。デプロイしなければ他の人が使えないという理由もありました。
 
-| 領域 | 取り組んだ内容 | ドキュメント |
+機能は自分の資金管理に十分なところまで作り、残りの時間はクラウド分野の経験に使いました。エンジニアとして働くようになったとき、フロントエンド、バックエンド、クラウド、データのどれを担当するかは前もって分からないので、時間のある大学生のうちにいろいろな分野を実際に経験しておこうと決めたからです。クラウドは事前知識がほとんどなかったため、資料を調べながら基本的な機能から一つずつ試しました。
+
+| 領域 | やったこと | ドキュメント |
 |---|---|---|
-| CI/CD 認証 | 静的アクセスキーの代わりに GitHub OIDC で AWS に認証し、SSM 経由でデプロイ（SSH ポートは完全に閉鎖） | [troubleshooting-oidc-ssm-deploy.md](docs/troubleshooting-oidc-ssm-deploy.md) |
-| HTTPS | Let's Encrypt 証明書を無停止（webroot 方式）で発行し、cron による自動更新を検証。その後、固定 IP がなくてもドメインが切れないよう DuckDNS の動的 DNS と IP 自動更新スクリプトに移行 | [devops-roadmap.md](docs/devops-roadmap.md) |
-| CI/CD の動作条件 | ワークフローごとのトリガー・パス条件、デプロイ設定値の保存場所の整理 | [cicd-pipeline-reference.md](docs/cicd-pipeline-reference.md) |
-| デプロイの安定性 | イメージの sha タグを用いたロールバックのリハーサル（実際に前のバージョンへ戻して復旧まで確認） | [rollback-drill.md](docs/rollback-drill.md) |
-| 可観測性 | Docker の awslogs によるコンテナログ収集、CloudWatch Agent によるメモリ・ディスクのメトリクス収集、しきい値アラーム（SNS） | [cloudwatch-setup.md](docs/cloudwatch-setup.md) |
-| 障害復旧 | DB の自動バックアップ（S3）と、実際にテーブルを削除して復旧まで検証したリハーサル | [backup-restore-drill.md](docs/backup-restore-drill.md) |
-| インフラの再現性 | コンソールで作成したインフラ 6 グループ・15 リソースを `terraform import` でコード化し、`plan` が差分なしになるまで検証。state はローカルではなくバージョニングを有効にした S3 バックエンドに置き、PC が失われてもインフラの管理権を失わないようにした | [terraform-import.md](docs/terraform-import.md) |
-| 協業ワークフロー | trunk-based のブランチ戦略、PR 必須・CI 通過必須のブランチ保護ルール、squash マージのみ許可 | [branching-strategy.md](docs/branching-strategy.md) |
-| 実践的なトラブルシューティング | デプロイ用ドメイン変更後の CORS エラー、そして README のとおりにローカルで動くかを実際に検証して判明した三つの原因（プロキシ・証明書・ポート衝突） | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
-| 認可の検証 | 中心となる原則をドキュメントではなくテストで固定 — 他人のデータへのアクセスは 404、トークン検証、カテゴリのタイプ変更の禁止など統合テスト 17 件を PR ごとに CI で実行 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
+| 自動デプロイ | PR を出すと GitHub Actions でビルド・テスト（CI）、main にマージされると Docker イメージを作って EC2 にデプロイ（CD）。フロントエンドとバックエンドはワークフローを分け、変更した側だけをデプロイ | [cicd-pipeline-reference.md](docs/cicd-pipeline-reference.md) |
+| HTTPS・ドメイン | Let's Encrypt の証明書を適用し、期限前に自動更新。IP が入った sslip.io のアドレスの代わりに自分の名前のアドレスを使いたくて、無料の DuckDNS に変更（サーバーが現在の IP を定期的に通知する仕組みのため、EC2 の再起動で IP が変わっても同じアドレスで接続できる） | [devops-roadmap.md](docs/devops-roadmap.md) |
+| SSH なしのデプロイ | SSH キーでサーバーに接続していたデプロイを、実行のたびに AWS から一時的な権限を受け取る方式（OIDC）と SSM によるコマンド送信に変更し、22 番ポートを閉鎖 | [troubleshooting-oidc-ssm-deploy.md](docs/troubleshooting-oidc-ssm-deploy.md) |
+| ロールバック | デプロイするイメージにコミット番号を付け、前のバージョンに戻してから再度上げる練習 | [rollback-drill.md](docs/rollback-drill.md) |
+| バックアップ・復旧 | 毎日 DB を S3 にバックアップし、実際にテーブルを削除してから復旧する練習 | [backup-restore-drill.md](docs/backup-restore-drill.md) |
+| モニタリング | CloudWatch でコンテナのログとメモリ・ディスク使用量を収集し、メモリが 85% を超えるとメールで通知 | [cloudwatch-setup.md](docs/cloudwatch-setup.md) |
+| Terraform | コンソールで作った AWS リソースを Terraform のコードに移してみた。初めて使ったツールで、まだ慣れていない | [terraform-import.md](docs/terraform-import.md) |
+| ブランチ運用 | main ブランチには PR と CI 通過を経てのみマージできるよう保護ルールを設定 | [branching-strategy.md](docs/branching-strategy.md) |
+| エラー対応 | ドメイン変更後に会員登録ができなくなった CORS エラー、README のとおりにローカルで動かなかった三つの原因 | [troubleshooting-cors-signup.md](docs/troubleshooting-cors-signup.md) · [troubleshooting-local-docker-run.md](docs/troubleshooting-local-docker-run.md) |
+| アクセス権限のテスト | 他の人の取引やカテゴリにアクセスすると拒否されるかを統合テスト 17 件で確認し、PR ごとに CI で実行 | [authorization/](backend/src/test/java/com/moneylog/backend/authorization) |
 
-このうち多く（OIDC、IaC、可観測性、バックアップ／復旧リハーサル）は、一般的な新卒のポートフォリオではあまり扱われない、実際の運用経験がなければ出てこない項目です。各ステップをなぜここまで広げたのか、そして費用と時間の制約の中でどのトレードオフを選んだのかは [devops-roadmap.md](docs/devops-roadmap.md) にまとめています。
+この中で一番長く詰まったのは、SSH なしのデプロイへの切り替えでした。公式ドキュメントどおりに設定したのに認証が 6 回続けて拒否され、設定値の入力ミスを疑って値をコードに直接書いても同じでした。設定をいくら変えても通らないので、推測をやめて、GitHub が実際に AWS に送っている値をログに出して確認することにしました。確認すると、リポジトリ名の後ろに数字の ID が付いた形式で、ドキュメントの例とは違っていました。この値に合わせるとすぐに通りました。次はデプロイのコマンドが失敗しましたが、SSM はコマンドを root 権限で実行する一方、docker compose が別のユーザーのフォルダにしかインストールされていなかったことが原因でした。
+
+AWS は無料枠の範囲内だけで使うように構成し、実際の請求額は 0 円です。
 
 ## 技術スタック
 
@@ -80,7 +88,7 @@ flowchart TB
     M -.-> J
 ```
 
-AWS リソース（EC2・セキュリティグループ・IAM・S3・CloudWatch）は Terraform のコードで、デプロイ経路はワークフローファイルで定義しています。ただし **インスタンス内部の設定 — 証明書の自動更新 cron、DuckDNS の IP 更新、DB バックアップスクリプト、`.env` — は今のところ手作業で構成しています。** 仮に今インスタンスが失われた場合、`terraform apply` でインフラ自体は復旧しますが、これらの設定は再び手で入れ直す必要があります。この部分を user_data または Ansible に移すことが次のステップです。
+AWS リソース（EC2・セキュリティグループ・IAM・S3・CloudWatch）は Terraform のコードで、デプロイの流れは GitHub Actions のワークフローファイルで定義しています。ただし、サーバー内の設定（証明書の自動更新、DuckDNS の IP 更新、DB バックアップスクリプト、`.env`）はまだ手作業で入れた状態のため、サーバーを作り直すとこの部分は再設定が必要です。
 
 ## 基本機能
 
@@ -103,7 +111,7 @@ docker compose up -d --build
 
 ### コードを書きながら開発する場合
 
-上の方法は本番の姿をそのまま再現できる代わりに、コードを一行直すたびにイメージを再ビルドする必要があります。開発中は **DB だけをコンテナで動かし、残りは開発サーバーで** 起動するほうが速いです。
+上の方法は本番の姿をそのまま再現できる代わりに、コードを一行直すたびにイメージを再ビルドする必要があります。開発中は DB だけをコンテナで動かし、残りは開発サーバーで起動するほうが速いです。
 
 ```bash
 docker compose up -d mysql          # DB のみ
@@ -113,8 +121,8 @@ cd frontend && npm run dev          # フロントエンド (localhost:5173)
 
 Vite の開発サーバーが `/api` を `localhost:8080` にプロキシするため、この場合も CORS は発生しません。バックエンドはデフォルトプロファイルで `localhost:3307` の MySQL を参照しますが、これは上のコンテナが公開するポートです。
 
-なお、二つの方法は **8080 番ポートを共有するため同時には起動できません。**
+なお、二つの方法は 8080 番ポートを共有するため、同時には起動できません。
 
 ## 今後の予定
 
-残りの期間は新しい機能を増やすよりも、今あるものの完成度を上げることに使います。次の目標は、上に挙げたインスタンス内部の設定（証明書更新の cron、DuckDNS の IP 更新、DB バックアップスクリプト）をコードに移し、インスタンスが失われても手で入れ直すものが残らない状態にすることです。予算機能・統計の可視化・CSV エクスポートといった機能拡張はその次の順番になります。
+まずは初めて使った Terraform をきちんと理解し、上に書いたサーバー内の設定もコードに移して、サーバーを作り直しても手で入れ直すものがない状態にしたいと考えています。機能面では、予算設定、統計の可視化、CSV エクスポートを追加してみたいです。
